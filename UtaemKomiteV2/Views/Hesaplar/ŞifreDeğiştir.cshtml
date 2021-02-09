@@ -1,0 +1,42 @@
+﻿@model UtaemKomiteV2.ViewModels.HesaplarSifreDegistirViewModel
+
+@{
+    ViewData["Title"] = "ŞifreDeğiştir";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3>Şifremi Değiştir</h3>
+<br />
+@if ((string)ViewBag.cevap == "Tamam")
+{
+    <h1>Şifreniz değiştirildi.</h1>
+}
+else
+{
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="ŞifreDeğiştir">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="oldpassword" class="control-label"></label>
+                <input asp-for="oldpassword" class="form-control" />
+                <span asp-validation-for="oldpassword" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="newpassword" class="control-label"></label>
+                <input asp-for="newpassword" class="form-control" />
+                <span asp-validation-for="newpassword" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="newpassword2" class="control-label"></label>
+                <input asp-for="newpassword2" class="form-control" />
+                <span asp-validation-for="newpassword2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Kaydet" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+}
+

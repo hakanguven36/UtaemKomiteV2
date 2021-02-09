@@ -1,0 +1,54 @@
+﻿@model UtaemKomiteV2.Models.Kullar
+
+<div class="row">
+    <div class="col-md">
+        <form id="kullaniciDuzenleForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ID" />
+            <div class="form-group">
+                <label asp-for="kulname" class="control-label"></label>
+                <input asp-for="kulname" class="form-control" />
+                <span asp-validation-for="kulname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="kulpass" class="control-label"></label>
+                <input asp-for="kulpass" class="form-control" />
+                <span asp-validation-for="kulpass" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="hatirla" /> @Html.DisplayNameFor(model => model.hatirla)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="hatali" class="control-label"></label>
+                <input asp-for="hatali" class="form-control" />
+                <span asp-validation-for="hatali" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="kilitliTarih" class="control-label"></label>
+                <input asp-for="kilitliTarih" class="form-control" />
+                <span asp-validation-for="kilitliTarih" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="admin" /> @Html.DisplayNameFor(model => model.admin)
+                </label>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Düzenle" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    $("#kullaniciDuzenleForm").submit(function (e) {
+        e.preventDefault();
+        new OzAjax("/SuperAdmin/KullanıcıDüzenle", POST, $("#kullaniciDuzenleForm").serialize(), kullaniciDuzenleBasari).BasitGonder();
+        function kullaniciDuzenleBasari(data) {
+            new OzModal().Bilgi(data, 1000);
+            KullaniciListele();
+        }
+    })
+</script>
+

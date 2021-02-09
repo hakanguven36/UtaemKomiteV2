@@ -1,0 +1,56 @@
+﻿@model IEnumerable<UtaemKomiteV2.Models.Kullar>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.kulname)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.kulpass)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.hatirla)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.hatali)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.kilitliTarih)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.admin)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.kulname)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.kulpass)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.hatirla)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.hatali)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.kilitliTarih)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.admin)
+            </td>
+            <td>
+                <button class="btn btn-warning" onclick="KullaniciDuzenleFormAc(@item.ID)">Düzenle</button>
+                <button class="btn btn-danger" onclick="KullaniciSilOnayIste(@item.ID)">Sil</button>
+                
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

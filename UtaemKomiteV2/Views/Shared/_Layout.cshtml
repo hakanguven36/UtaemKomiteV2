@@ -1,0 +1,117 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - UTAEM</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link href="~/lib/three-dots.css" rel="stylesheet" />
+    <link href="~/fontawesome/css/fontawesome.css" rel="stylesheet" />
+    <link href="~/fontawesome/css/brands.css" rel="stylesheet" />
+    <link href="~/fontawesome/css/solid.css" rel="stylesheet" />
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="~/lib/jquery.blockUI.js"></script>
+    <script src="~/jquery.autosize.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+</head>
+<body>
+
+    <!-- #region Gerekli Modüller -->
+    @*<div class="modal fade" data-backdrop="static" id="ozModal">*@
+    <div class="modal fade" id="ozModal" style="flex:0 1 auto">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header modal-baslik bg-dark" style="padding:0.5em">
+                    <div id="ozModalBaslik" class="text-light"></div>
+                    <div class="float-right">
+                        <button type="button" class="btn btn-sm btn-light" data-dismiss="modal" aria-label="Close">X</button>
+                    </div>
+                </div>
+                <div class="modal-body" id="ozIcerik">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="display:none">
+        <div class="bekleyiniz">
+            <div class='p-3 m-3' style='display:table !important'>
+                <center>
+                    <div class='dot-spin'></div>
+                    <br />
+                    Lütfen bekleyiniz
+                </center>
+            </div>
+        </div>
+        <div class="hataOldu">
+            <span class="fas fa-exclamation-circle"> Bir hata oldu</span>
+        </div>
+        <div id="ozOnayDiv" style="min-height:40em">
+            <div id="ozOnaySoruDiv"></div>
+            <br />
+            <button class="btn " id="ozOnayEvetBtn">Yes</button>
+            <button class="btn " id="ozOnayHayirBtn">No</button>
+        </div>
+    </div>
+    <!-- #endregion -->
+
+    <div class="arkafon"></div>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">UTAEM KOMİTE</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Projeler"><u>Projeler</u></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Tutanaklar"><u>Tutanaklar</u></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="YeniDosyaEkle"><u>+ Yeni Dosya Ekle</u></a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                    <ul class="navbar-nav flex-sm-row ml-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Hoşgeldiniz @(Context.Session.GetString("kulname") ?? "İsimsiz")
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" asp-action="ŞifreDeğiştir" asp-controller="Hesaplar">Şifremi Değiştir</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" asp-action="ÇıkışYap" asp-controller="Hesaplar">Çıkış Yap</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </nav>
+    </header>
+    
+    <div class="container slowload">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2021 - UTAEM
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,39 @@
+﻿@model UtaemKomiteV2.Models.Kullar
+
+<h4>Kullar</h4>
+<hr />
+<div class="row">
+    <div class="col-md">
+        <form id="kullaniciYaratForm">
+            <div class="form-group">
+                <label asp-for="kulname" class="control-label"></label>
+                <input asp-for="kulname" class="form-control" />
+                <span asp-validation-for="kulname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="kulpass" class="control-label"></label>
+                <input asp-for="kulpass" class="form-control" />
+                <span asp-validation-for="kulpass" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="admin" /> @Html.DisplayNameFor(model => model.admin)
+                </label>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Oluştur" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $("#kullaniciYaratForm").submit(function (e) {
+        e.preventDefault();
+        new OzAjax("/SuperAdmin/KullanıcıYarat", POST, $("#kullaniciYaratForm").serialize(), KullaniciYaratBasari).BasitGonder();
+        function KullaniciYaratBasari(data) {
+            new OzModal().Bilgi(data, 1000, "Kullanici Oluştur");
+            KullaniciListele();
+        }
+    });
+</script>

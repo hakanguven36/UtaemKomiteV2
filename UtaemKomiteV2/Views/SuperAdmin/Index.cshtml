@@ -1,0 +1,67 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h3>Süper Admin</h3>
+    
+<button class="btn btn-success" onclick="KullaniciYaratFormAc()"> + Kullanıcı Ekle</button>
+<div id="kullaniciListDiv"></div>
+
+<script>
+    $(document).ready(function () {
+        KullaniciListele();
+    });
+
+    function KullaniciListele() {
+        new OzAjax("/SuperAdmin/KullanıcıListele", GET, null, KullaniciListeleBasari).BasitGonder();
+        function KullaniciListeleBasari(data) {
+            $("#kullaniciListDiv").html(data);
+        }
+    }
+
+    function KullaniciYaratFormAc() {
+        new OzAjax("/SuperAdmin/KullanıcıYarat", GET, null, KullaniciYaratFormAcBasari).BasitGonder();
+        function KullaniciYaratFormAcBasari(data) {
+            new OzModal().Sayfa(data, "Kullanıcı Ekle");
+        }
+    }
+
+    function KullaniciDuzenleFormAc(id) {
+        new OzAjax("/SuperAdmin/KullanıcıDüzenle", GET, { id: id }, KullaniciDuzenleFormAcBasari).BasitGonder();
+        function KullaniciDuzenleFormAcBasari(data) {
+            new OzModal().Sayfa(data, "Kullanıcı Düzenle");
+        }
+    }
+
+    var silinecekID = 0;
+    function KullaniciSilOnayIste(id) {
+        silinecekID = id;
+        var onay = new OzOnay();
+        onay.soruTxt = "Bu kullanıcı tamamen silinecek! Onaylıyor musunuz?";
+        onay.evetCls = "btn btn-danger"
+        onay.evetTxt = "Sil";
+        onay.hayirCls = "btn btn-secondary";
+        onay.hayirTxt = "Vazgeç";
+        onay.Sor(KullaniciSilOnaylandi);
+        function KullaniciSilOnaylandi() {
+            KullaniciSil()
+        }
+        onay = null;
+    }
+
+    function KullaniciSil() {
+        alert(silinecekID);
+        new OzAjax("/SuperAdmin/KullanıcıSil", POST, { id: silinecekID }, KullaniciSilBasari).BasitGonder();
+        function KullaniciSilBasari(data) {
+            new OzModal().Bilgi(data, 1000);
+            KullaniciListele();
+        }
+    }
+
+</script>
+
+
+
+
+
