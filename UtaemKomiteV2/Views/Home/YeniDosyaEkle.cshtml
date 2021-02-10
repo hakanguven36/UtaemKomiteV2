@@ -1,7 +1,18 @@
-﻿
-@{
-    ViewData["Title"] = "YeniDosyaEkle";
-}
+﻿@model UtaemKomiteV2.Models.Dosya
 
-<h1>YeniDosyaEkle</h1>
+<h5>Dosya Ekle</h5>
+<hr />
 
+<form asp-action="YeniDosyaEkle" enctype="multipart/form-data">
+    <div class="form-group">
+        <label asp-for="tur" class="control-label"></label>
+        <select asp-for="tur" class="form-control" asp-items="Html.GetEnumSelectList<DOSYATURU>()"></select>
+    </div>
+    <div class="form-group">
+        <label for="file" class="control-label"></label>
+        <input type="file" class="form-control-file" name="file" id="file" />
+    </div>
+    <div class="form-group">
+        <input type="submit" value="EKLE" class="btn btn-primary" />
+    </div>
+</form>

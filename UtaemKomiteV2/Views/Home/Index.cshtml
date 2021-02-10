@@ -1,8 +1,46 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<UtaemKomiteV2.Models.Dosya>
+@{ int i = 0;
+    Random r = new Random(DateTime.Now.Millisecond);
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div>
+    @foreach (var item in Html.GetEnumSelectList<DOSYATURU>())
+    {
+    <div style="padding:1em; margin-bottom:1em; border-radius:1em; background-color:rgb(@r.Next(200,250),@r.Next(200,250),@r.Next(200, 250))">
+        <div class="auto">
+            <button onclick="YeniDosyaEkleFormAc('@item.Text')" class="btn btn-sm btn-warning float-right" ><span class="fas fa-plus"></span> Yeni Dosya Ekle</button>
+            <h5><u>@item.Text</u></h5>
+        </div>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Dosya adı</th>
+                    <th>Yükleme Tarihi</th>
+                    <th>Boyut</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var a in Model.Where(u => Convert.ToInt32(u.tur) == i))
+                {
+                    <tr>
+                        <td>@a.isim</td>
+                        <td>@a.tarih</td>
+                        <td>@a.boyut</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>        
+    }
 </div>
+
+<script>
+    function YeniDosyaEkleFormAc(dosyaTuru){
+        new OzAjax("/Home/YeniDosyaEkle", GET, { dosyaTuru: dosyaTuru }, formAcBasari).BasitGonder();
+        function formAcBasari(data) {
+            new OzModal().Sayfa(data);
+        }
+    }
+</script>

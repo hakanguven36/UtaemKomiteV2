@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using UtaemKomiteV2.Araclar;
@@ -13,33 +16,63 @@ namespace UtaemKomiteV2.Controllers
 	[Yetki("user")]
 	public class HomeController : Controller
 	{
-		private readonly ILogger<HomeController> _logger;
-
-		public HomeController(ILogger<HomeController> logger)
+		private string uploadsRoot;
+		MyContext db;
+		IWebHostEnvironment hostEnvironment;
+		public HomeController(MyContext db, IWebHostEnvironment hostEnvironment)
 		{
-			_logger = logger;
+			this.db = db;
+			this.hostEnvironment = hostEnvironment;
+			uploadsRoot = hostEnvironment.WebRootPath + "/Dosyalar";
 		}
 
 		public IActionResult Index()
 		{
-			return View();
+			return View(db.Dosya.ToList());
 		}
 
-		public IActionResult Projeler()
+		[HttpGet]
+		public IActionResult YeniDosyaEkle(string dosyaTuru)
 		{
-			return View();
+			DOSYATURU tur = Enum.Parse<DOSYATURU>(dosyaTuru);
+			return PartialView(new Dosya() { tur = tur });
 		}
 
-		public IActionResult Tutanaklar()
+		[HttpPost]
+		public IActionResult YeniDosyaEkle(DOSYATURU tur, IFormFile file)
 		{
-			return View();
+			try
+			{
+				Dosya dosya = new Dosya();
+				dosya.tur = tur;
+				dosya.tarih = DateTime.Now;
+				dosya.isim = Path.GetFileNameWithoutExtension(file.FileName);
+				dosya.boyut = Math.Round(Convert.ToDouble(file.Length),2);
+				dosya.uzantı = Path.GetExtension(file.FileName);
+				dosya.sysname = Arac.RandomString(8);
+
+				string path = Path.Combine(uploadsRoot, dosya.sysname);
+				using(var filestream = new FileStream(path, FileMode.CreateNew))
+				{
+					Stream a = file.OpenReadStream();
+					
+					file.CopyTo(filestream);
+				}
+				db.Add(dosya);
+				db.SaveChanges();
+				return RedirectToAction("Index");
+			}
+			catch (Exception e)
+			{
+				ViewBag.Hata = e.Message;
+				return View();
+			}
 		}
 
-		public IActionResult YeniDosyaEkle()
+		public IActionResult Dosyaİndir(int id)
 		{
-			return View();
+			return Json("Tamam");
 		}
-
 
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 		public IActionResult Error()

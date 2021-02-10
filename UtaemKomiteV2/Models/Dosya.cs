@@ -26,6 +26,8 @@ namespace UtaemKomiteV2.Models
 		public double boyut { get; set; }
 
 		public bool silindi { get; set; }
+
+		public DOSYATURU tur { get; set; }
 	}
 
 	public enum DOSYATURU{
