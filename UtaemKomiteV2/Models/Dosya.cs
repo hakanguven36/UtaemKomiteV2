@@ -27,6 +27,9 @@ namespace UtaemKomiteV2.Models
 
 		public bool silindi { get; set; }
 
+		[StringLength(60)]
+		public string kulName { get; set; }
+
 		public DOSYATURU tur { get; set; }
 	}
 

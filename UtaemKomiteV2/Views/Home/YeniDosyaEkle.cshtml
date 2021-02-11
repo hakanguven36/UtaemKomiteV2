@@ -3,7 +3,7 @@
 <h5>Dosya Ekle</h5>
 <hr />
 
-<form asp-action="YeniDosyaEkle" enctype="multipart/form-data">
+<form id="YeniDosyaEkle" enctype="multipart/form-data">
     <div class="form-group">
         <label asp-for="tur" class="control-label"></label>
         <select asp-for="tur" class="form-control" asp-items="Html.GetEnumSelectList<DOSYATURU>()"></select>
@@ -16,3 +16,19 @@
         <input type="submit" value="EKLE" class="btn btn-primary" />
     </div>
 </form>
+
+<script>
+    $("#YeniDosyaEkle").submit(function (e) {
+        e.preventDefault();
+        new OzAjax("/Home/YeniDosyaEkle", POST, $("#YeniDosyaEkle"), yeniDosyaEkleBasari).MultiGonder();
+        function yeniDosyaEkleBasari(data) {
+            alert(data);
+            if (data = "Tamam") {
+                window.location = "/Home/Index";
+            }
+            else {
+                new OzModal().Bilgi(data);
+            }
+        }
+    })
+</script>

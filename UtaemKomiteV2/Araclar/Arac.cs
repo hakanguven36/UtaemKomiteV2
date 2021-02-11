@@ -108,7 +108,9 @@ namespace UtaemKomiteV2.Araclar
 			return cipherText;
 		}
 		#endregion
+		#region DosyaŞifreleme
 
+		#endregion
 		#region Email
 
 		// ADD THIS TO CONFIG <system.net></system.net>
@@ -148,6 +150,57 @@ namespace UtaemKomiteV2.Araclar
 		//	}
 		//}
 		#endregion
+	}
+
+	public static class AES
+	{
+		public static string EncryptFile(string inputFile, string outputFile)
+		{
+			try
+			{
+				UnicodeEncoding UE = new UnicodeEncoding();
+				byte[] key = UE.GetBytes("MyKEY001");
+				string cryptFile = outputFile;
+				FileStream fsCrypt = new FileStream(cryptFile, FileMode.Create);
+				RijndaelManaged RMCrypto = new RijndaelManaged();
+				CryptoStream cs = new CryptoStream(fsCrypt, RMCrypto.CreateEncryptor(key, key), CryptoStreamMode.Write);
+				FileStream fsIn = new FileStream(inputFile, FileMode.Open);
+				int data;
+				while ((data = fsIn.ReadByte()) != -1)
+					cs.WriteByte((byte)data);
+				fsIn.Close();
+				cs.Close();
+				fsCrypt.Close();
+				return "Tamam";
+			}
+			catch(Exception e)
+			{
+				return e.Message;
+			}
+		}
+
+		public static void DecryptFile(string inputFile, string outputFile)
+		{
+			try
+			{
+				UnicodeEncoding UE = new UnicodeEncoding();
+				byte[] key = UE.GetBytes("MyKEY001");
+				FileStream fsCrypt = new FileStream(inputFile, FileMode.Open);
+				RijndaelManaged RMCrypto = new RijndaelManaged();
+				CryptoStream cs = new CryptoStream(fsCrypt, RMCrypto.CreateDecryptor(key, key), CryptoStreamMode.Read);
+				FileStream fsOut = new FileStream(outputFile, FileMode.Create);
+				int data;
+				while ((data = cs.ReadByte()) != -1)
+					fsOut.WriteByte((byte)data);
+				fsOut.Close();
+				cs.Close();
+				fsCrypt.Close();
+			}
+			catch
+			{
+
+			}
+		}
 	}
 
 	public static class ControllerExtensions

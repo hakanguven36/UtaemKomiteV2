@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UtaemKomiteV2.Araclar;
@@ -13,15 +15,18 @@ namespace UtaemKomiteV2.Controllers
 	[Yetki("superadmin")]
     public class SuperAdminController : Controller
     {
+		private string uploadsRoot;
 		MyContext db;
-		public SuperAdminController(MyContext db)
+		IWebHostEnvironment hostEnvironment;
+		public SuperAdminController(MyContext db, IWebHostEnvironment hostEnvironment)
 		{
 			this.db = db;
+			this.hostEnvironment = hostEnvironment;
+			uploadsRoot = hostEnvironment.WebRootPath + "/Dosyalar";
 		}
 
         public IActionResult Index()
         {
-		
             return View();
         }
 
@@ -91,6 +96,32 @@ namespace UtaemKomiteV2.Controllers
 			{
 				return Json("Hata: " + e.Message);
 			}
+		}
+
+		[HttpPost]
+		public IActionResult TümDosyalarıTemizle()
+		{
+			try
+			{
+				DirectoryInfo di = new DirectoryInfo(uploadsRoot);
+				var allfiles = di.GetFiles();
+				for (int i = 0; i < allfiles.Length; i++)
+				{
+					if(allfiles[i].Name != "yertutucu.txt")
+					allfiles[i].Delete();
+				}
+
+				var dosyalar = db.Dosya.ToList();
+				db.RemoveRange(dosyalar);
+				db.SaveChanges();
+
+				return Json("Tamam");
+			}
+			catch (Exception e)
+			{
+				return Json("Hata: " + e.Message);
+			}
+
 		}
 	}
 }

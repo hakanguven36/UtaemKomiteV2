@@ -18,6 +18,7 @@
                     <th>Dosya adı</th>
                     <th>Yükleme Tarihi</th>
                     <th>Boyut</th>
+                    <th>Yükleyen</th>
                     <th></th>
                 </tr>
             </thead>
@@ -28,11 +29,16 @@
                         <td>@a.isim</td>
                         <td>@a.tarih</td>
                         <td>@a.boyut</td>
+                        <td>@a.kulName</td>
+                        <td>
+                            <button>İndir</button>
+                        </td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>        
+        i++;
     }
 </div>
 
