@@ -1,5 +1,6 @@
 ﻿@model IEnumerable<UtaemKomiteV2.Models.Dosya>
-@{ int i = 0;
+@{ 
+    int i = 0;
     Random r = new Random(DateTime.Now.Millisecond);
 }
 
@@ -27,18 +28,7 @@
                 {
                     <tr>
                         <td>
-                            @if (a.uzantı == ".pdf")
-                            {
-                                <img src="~/resim/pdflogo.png" height="24" />
-                            }
-                            else if (a.uzantı == ".doc" | a.uzantı == ".docx")
-                            {
-                                <img src="~/resim/wordlogo.png" height="24" />
-                            }
-                            else if (a.uzantı == ".xls" | a.uzantı == ".xlsx")
-                            {
-                                <img src="~/resim/excellogo.png" height="24" />
-                            }
+                            <img src="~/resim/@a.icon" height="24" />
                             @a.isim
                         </td>
                         <td>@a.tarih</td>

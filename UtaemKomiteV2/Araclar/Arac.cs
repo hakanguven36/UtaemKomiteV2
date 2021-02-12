@@ -166,11 +166,13 @@ namespace UtaemKomiteV2.Araclar
 				Stream stream = dosya.OpenReadStream();
 				MemoryStream ms = new MemoryStream();
 				stream.CopyTo(ms);
-				byte[] buffer = ms.ToArray();
 
 				FileStream outputFS = new FileStream(outputFile, FileMode.Create);
 				CryptoStream cs = new CryptoStream(outputFS, RMCrypto.CreateEncryptor(key, key), CryptoStreamMode.Write);
+				
+				byte[] buffer = ms.ToArray();
 				cs.Write(buffer, 0, buffer.Length);
+
 				cs.Close();
 				outputFS.Close();
 				return "Tamam";
@@ -181,26 +183,30 @@ namespace UtaemKomiteV2.Araclar
 			}
 		}
 
-		public static void DecryptFile(string inputFile, string outputFile)
+		public static string DecryptFile(FileStream inputFile, string outputFile)
 		{
 			try
 			{
 				UnicodeEncoding UE = new UnicodeEncoding();
 				byte[] key = UE.GetBytes("MyKEY001");
-				FileStream fsCrypt = new FileStream(inputFile, FileMode.Open);
 				RijndaelManaged RMCrypto = new RijndaelManaged();
-				CryptoStream cs = new CryptoStream(fsCrypt, RMCrypto.CreateDecryptor(key, key), CryptoStreamMode.Read);
-				FileStream fsOut = new FileStream(outputFile, FileMode.Create);
-				int data;
-				while ((data = cs.ReadByte()) != -1)
-					fsOut.WriteByte((byte)data);
-				fsOut.Close();
-				cs.Close();
-				fsCrypt.Close();
-			}
-			catch
-			{
 
+				MemoryStream ms = new MemoryStream();
+				inputFile.CopyTo(ms);
+
+				FileStream outputFS = new FileStream(outputFile, FileMode.Create);
+				CryptoStream cs = new CryptoStream(inputFile, RMCrypto.CreateDecryptor(key, key), CryptoStreamMode.Read);
+
+				byte[] buffer = ms.ToArray();
+				cs.Write(buffer, 0, buffer.Length);
+
+				cs.Close();
+				inputFile.Close();
+				return "Tamam";
+			}
+			catch (Exception e)
+			{
+				return e.Message;
 			}
 		}
 	}

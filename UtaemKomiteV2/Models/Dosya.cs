@@ -31,6 +31,9 @@ namespace UtaemKomiteV2.Models
 		public string kulName { get; set; }
 
 		public DOSYATURU tur { get; set; }
+
+		[StringLength(60)]
+		public string icon { get; set; }
 	}
 
 	public enum DOSYATURU{
