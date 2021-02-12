@@ -6,7 +6,7 @@
 <div>
     @foreach (var item in Html.GetEnumSelectList<DOSYATURU>())
     {
-    <div style="padding:1em; margin-bottom:1em; border-radius:1em; background-color:rgb(@r.Next(200,250),@r.Next(200,250),@r.Next(200, 250))">
+    <div class="dosyalarDiv">
         <div class="auto">
             <button onclick="YeniDosyaEkleFormAc('@item.Text')" class="btn btn-sm btn-warning float-right" ><span class="fas fa-plus"></span> Yeni Dosya Ekle</button>
             <h5><u>@item.Text</u></h5>
@@ -16,8 +16,8 @@
             <thead>
                 <tr>
                     <th>Dosya adı</th>
-                    <th>Yükleme Tarihi</th>
-                    <th>Boyut</th>
+                    <th>Tarih</th>
+                    <th>Boyut(kb)</th>
                     <th>Yükleyen</th>
                     <th></th>
                 </tr>
@@ -26,7 +26,21 @@
                 @foreach (var a in Model.Where(u => Convert.ToInt32(u.tur) == i))
                 {
                     <tr>
-                        <td>@a.isim</td>
+                        <td>
+                            @if (a.uzantı == ".pdf")
+                            {
+                                <img src="~/resim/pdflogo.png" height="24" />
+                            }
+                            else if (a.uzantı == ".doc" | a.uzantı == ".docx")
+                            {
+                                <img src="~/resim/wordlogo.png" height="24" />
+                            }
+                            else if (a.uzantı == ".xls" | a.uzantı == ".xlsx")
+                            {
+                                <img src="~/resim/excellogo.png" height="24" />
+                            }
+                            @a.isim
+                        </td>
                         <td>@a.tarih</td>
                         <td>@a.boyut</td>
                         <td>@a.kulName</td>
@@ -49,4 +63,10 @@
             new OzModal().Sayfa(data);
         }
     }
+    $(".dosyalarDiv").each(function (i, e) {
+        var rand1 = Math.floor(200 + Math.random() * 50);
+        var rand2 = Math.floor(200 + Math.random() * 50);
+        var rand3 = Math.floor(200 + Math.random() * 50);
+        $(this).css("background-color", "rgb(" + rand1 + "," + rand2 + "," + rand3 + ")");
+    });
 </script>

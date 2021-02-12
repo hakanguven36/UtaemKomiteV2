@@ -4,13 +4,14 @@
 <hr />
 
 <form id="YeniDosyaEkle" enctype="multipart/form-data">
+    <input type="hidden" id="dosyaTuru" value="@Enum.GetName(typeof(DOSYATURU),Model.tur)" />
     <div class="form-group">
-        <label asp-for="tur" class="control-label"></label>
+        <label for="tur" class="control-label">Dosya Türü</label>
         <select asp-for="tur" class="form-control" asp-items="Html.GetEnumSelectList<DOSYATURU>()"></select>
     </div>
     <div class="form-group">
-        <label for="file" class="control-label"></label>
-        <input type="file" class="form-control-file" name="file" id="file" />
+        <label for="budosya" class="control-label"></label>
+        <input type="file" class="form-control-file" name="budosya" id="budosya" />
     </div>
     <div class="form-group">
         <input type="submit" value="EKLE" class="btn btn-primary" />
@@ -20,14 +21,18 @@
 <script>
     $("#YeniDosyaEkle").submit(function (e) {
         e.preventDefault();
-        new OzAjax("/Home/YeniDosyaEkle", POST, $("#YeniDosyaEkle"), yeniDosyaEkleBasari).MultiGonder();
+        var formData = new FormData();
+        var dosya = document.getElementById("budosya").files[0];
+        formData.append("dosya", dosya);
+        var dosyaTuru = $("#dosyaTuru").val();
+        formData.append("tur", dosyaTuru);
+        new OzAjax("/Home/YeniDosyaEkle", POST, formData, yeniDosyaEkleBasari).MultiGonder();
         function yeniDosyaEkleBasari(data) {
-            alert(data);
-            if (data = "Tamam") {
+            if (data == '"Tamam"') {
                 window.location = "/Home/Index";
             }
             else {
-                new OzModal().Bilgi(data);
+                new OzModal().Bilgi(data,2000);
             }
         }
     })

@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Web;
 using UtaemKomiteV2.Models;
 using System.Globalization;
+using Microsoft.AspNetCore.Http;
 
 namespace UtaemKomiteV2.Araclar
 {
@@ -154,23 +155,24 @@ namespace UtaemKomiteV2.Araclar
 
 	public static class AES
 	{
-		public static string EncryptFile(string inputFile, string outputFile)
+		public static string EncryptFile(IFormFile dosya, string outputFile)
 		{
 			try
 			{
 				UnicodeEncoding UE = new UnicodeEncoding();
 				byte[] key = UE.GetBytes("MyKEY001");
-				string cryptFile = outputFile;
-				FileStream fsCrypt = new FileStream(cryptFile, FileMode.Create);
 				RijndaelManaged RMCrypto = new RijndaelManaged();
-				CryptoStream cs = new CryptoStream(fsCrypt, RMCrypto.CreateEncryptor(key, key), CryptoStreamMode.Write);
-				FileStream fsIn = new FileStream(inputFile, FileMode.Open);
-				int data;
-				while ((data = fsIn.ReadByte()) != -1)
-					cs.WriteByte((byte)data);
-				fsIn.Close();
+
+				Stream stream = dosya.OpenReadStream();
+				MemoryStream ms = new MemoryStream();
+				stream.CopyTo(ms);
+				byte[] buffer = ms.ToArray();
+
+				FileStream outputFS = new FileStream(outputFile, FileMode.Create);
+				CryptoStream cs = new CryptoStream(outputFS, RMCrypto.CreateEncryptor(key, key), CryptoStreamMode.Write);
+				cs.Write(buffer, 0, buffer.Length);
 				cs.Close();
-				fsCrypt.Close();
+				outputFS.Close();
 				return "Tamam";
 			}
 			catch(Exception e)

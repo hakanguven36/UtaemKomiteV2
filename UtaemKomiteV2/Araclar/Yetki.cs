@@ -20,6 +20,8 @@ namespace UtaemKomiteV2.Araclar
 		{
 			string kul = context.HttpContext.Session.GetString("kulrol");
 
+			
+
 			switch (cont)
 			{
 				case "superadmin":

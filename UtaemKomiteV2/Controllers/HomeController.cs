@@ -24,7 +24,7 @@ namespace UtaemKomiteV2.Controllers
 		{
 			this.db = db;
 			this.hostEnvironment = hostEnvironment;
-			uploadsRoot = hostEnvironment.WebRootPath + "/Dosyalar";
+			uploadsRoot = hostEnvironment.WebRootPath + @"/Dosyalar";
 		}
 
 		public IActionResult Index()
@@ -40,38 +40,39 @@ namespace UtaemKomiteV2.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult YeniDosyaEkle(DOSYATURU tur, IFormFile file)
+		public IActionResult YeniDosyaEkle(string tur, IFormFile dosya)
 		{
+			
 			try
 			{
-				if (file == null | file.Length < 1)
+				DOSYATURU theTur;
+				Enum.TryParse(tur, true, out theTur);
+
+				if (dosya == null)
 				{
-					
-					return Json("Hata: Dosya yok ya da Boş!");
+					return Json("Hata: Dosya eklemediniz!");
 				}
-				Dosya dosya = new Dosya();
-				dosya.tur = tur;
-				dosya.tarih = DateTime.Now;
-				dosya.isim = Path.GetFileNameWithoutExtension(file.FileName);
-				dosya.boyut = Math.Round(Convert.ToDouble(file.Length),2);
-				dosya.uzantı = Path.GetExtension(file.FileName);
-				dosya.sysname = Arac.RandomString(8);
-				dosya.kulName = HttpContext.Session.GetString("kulname");
+				else if (dosya.Length < 1)
+				{
+					return Json("Hata: Dosya boş görünüyor!");
+				}
+				Dosya d = new Dosya();
+				d.tur = theTur;
+				d.tarih = DateTime.Now;
+				d.isim = Path.GetFileNameWithoutExtension(dosya.FileName);
+				d.boyut = Math.Round(Convert.ToDouble(dosya.Length/1024),2);
+				d.uzantı = Path.GetExtension(dosya.FileName);
+				d.sysname = Arac.RandomString(8);
+				d.kulName = HttpContext.Session.GetString("kulname");
 
-				string pathPRE = Path.Combine(uploadsRoot, dosya.sysname + "PRE");
-				FileStream yaratPRE = new FileStream(pathPRE, FileMode.CreateNew);
-				file.CopyTo(yaratPRE);
-				yaratPRE.Close();
+				string path = Path.Combine(uploadsRoot, d.sysname);
+				string hata = AES.EncryptFile(dosya, path);
+				if(hata != "Tamam")
+					return Json("Hata: " + hata);
 
-				string path = Path.Combine(uploadsRoot, dosya.sysname);
-				AES.EncryptFile(pathPRE, path);
-
-				FileInfo fi = new FileInfo(pathPRE);
-				fi.Delete();
-
-				db.Add(dosya);
+				db.Add(d);
 				db.SaveChanges();
-				return Json("Index");
+				return Json("Tamam");
 			}
 			catch (Exception e)
 			{
