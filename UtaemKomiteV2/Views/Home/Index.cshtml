@@ -35,7 +35,7 @@
                         <td>@a.boyut</td>
                         <td>@a.kulName</td>
                         <td>
-                            <button>İndir</button>
+                            <a class="btn btn-sm btn-outline-primary" asp-controller="Home" asp-action="Dosyaİndir" asp-route-id="@a.ID"><span class="fas fa-file-download"></span></a>
                         </td>
                     </tr>
                 }

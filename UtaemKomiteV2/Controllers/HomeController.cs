@@ -18,16 +18,13 @@ namespace UtaemKomiteV2.Controllers
 	[Yetki("user")]
 	public class HomeController : Controller
 	{
-		string uploadsRoot;
-		string downloadsRoot;
 		MyContext db;
-		IWebHostEnvironment hostEnvironment;
+		string uploadsRoot;
+		
 		public HomeController(MyContext db, IWebHostEnvironment hostEnvironment)
 		{
 			this.db = db;
-			this.hostEnvironment = hostEnvironment;
 			uploadsRoot = hostEnvironment.WebRootPath + @"/Dosyalar";
-			string downloadsRoot = hostEnvironment.WebRootPath + @"/TempDownload";
 		}
 
 		public IActionResult Index()
@@ -48,32 +45,36 @@ namespace UtaemKomiteV2.Controllers
 			try
 			{
 				DOSYATURU theTur;
-				Enum.TryParse(tur, true, out theTur);
-
+				if (!Enum.TryParse(tur, true, out theTur))
+					throw new Exception("Hata: tür seçilmedi!");
 				if (dosya == null)
+					throw new Exception("Hata: Dosya eklemediniz!");
+				if (dosya.Length < 1)
+					throw new Exception("Hata: Dosya boş görünüyor!");
+
+				string sysname = Arac.RandomString(16);
+				string path = Path.Combine(uploadsRoot, sysname);
+
+				using (Stream gelenStream = dosya.OpenReadStream())
+				using (MemoryStream ms = new MemoryStream())
 				{
-					return Json("Hata: Dosya eklemediniz!");
+					gelenStream.CopyTo(ms);
+					using (MemoryStream output = new SIFRELEME().Kilitle(ms))
+					using (FileStream fs = new FileStream(path, FileMode.Create))
+						fs.Write(output.ToArray(), 0, Convert.ToInt32(output.Length));
 				}
-				else if (dosya.Length < 1)
-				{
-					return Json("Hata: Dosya boş görünüyor!");
-				}
+
+
 				Dosya d = new Dosya();
 				d.tur = theTur;
 				d.tarih = DateTime.Now;
 				d.isim = Path.GetFileNameWithoutExtension(dosya.FileName);
 				d.boyut = Math.Round(Convert.ToDouble(dosya.Length / 1024), 2);
 				d.uzantı = Path.GetExtension(dosya.FileName);
-				d.sysname = Arac.RandomString(8);
+				d.sysname = sysname;
 				d.kulName = HttpContext.Session.GetString("kulname");
 				IconMaker icon = new IconMaker();
 				d.icon = icon.Yap(dosya.FileName);
-
-				string path = Path.Combine(uploadsRoot, d.sysname);
-				string hata = AES.EncryptFile(dosya, path);
-				if (hata != "Tamam")
-					return Json("Hata: " + hata);
-
 				db.Add(d);
 				db.SaveChanges();
 				return Json("Tamam");
@@ -84,34 +85,39 @@ namespace UtaemKomiteV2.Controllers
 			}
 		}
 
-		[DeleteFile]
 		public IActionResult Dosyaİndir(int id)
 		{
-			var d = db.Dosya.Find(id);
-			string path = Path.Combine(uploadsRoot, d.sysname);
-			string pathTemp = Path.Combine(downloadsRoot, d.sysname);
-			FileStream dosya = new FileStream(path, FileMode.Open, FileAccess.Read);
-			string hata = AES.DecryptFile(dosya, pathTemp);
-			dosya.Close();
-			FileStream dosyaHazır = new FileStream(pathTemp, FileMode.Open, FileAccess.Read);
-			if (hata != "Tamam")
-				return Json("Hata: " + hata);
+			MemoryStream output = new MemoryStream();
+			try
+			{
+				var d = db.Dosya.FirstOrDefault(u=>u.ID == id);
+				if(d==null) throw new Exception("Hata: Dosya ID'si hatalı");
+				string path = Path.Combine(uploadsRoot, d.sysname);
 
-			string mimeType = MimeUtility.GetMimeMapping(d.isim + d.uzantı);
-			string downloadName = d.isim + d.uzantı;
+				using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+				using (MemoryStream ms = new MemoryStream())
+				{
+					fs.CopyTo(ms);
+					output = new SIFRELEME().KilitAç(ms);
+				}
 
-			HttpContext.Response.OnCompleted(DownloadTamamlandı);
+				string mimeType = MimeUtility.GetMimeMapping(d.isim + d.uzantı);
+				string downloadName = d.isim + d.uzantı;
 
-			return File(dosya, mimeType, downloadName);
-		}
-
-		public async Task<int> DownloadTamamlandı()
-		{
-			var dosya = db.Dosya.Find(id);
+				return File(output.GetBuffer(), mimeType, downloadName);
+			}
+			catch (Exception e)
+			{
+				return Json("Hata: " + e.Message);
+			}
+			finally
+			{
+				HttpContext.Response.OnCompleted(async () => await Task.Run(() => output.Dispose()));
+			}
 			
-			await Task.Run(DosyaSil
-			return 0;
 		}
+
+		
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 		public IActionResult Error()
 		{
@@ -133,6 +139,8 @@ namespace UtaemKomiteV2.Controllers
 			{".jpg","picturelogo.png" },
 			{".jpeg","picturelogo.png" }
 		};
-		public string Yap(string filename) => dic[Path.GetExtension(filename)];
+		public string Yap(string filename) => dic.ContainsKey(Path.GetExtension(filename)) ?
+			dic[Path.GetExtension(filename)] :
+			"unknownlogo.png";
 	}
 }

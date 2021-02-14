@@ -12,63 +12,57 @@ namespace Deneme
 	{
 		static void Main(string[] args)
 		{
-			string path = @"pdflogo.png";
-			string outputfile = @"pdflogoEnc.png";
-			var byts = File.ReadAllBytes(path);
-			string hata = AES.EncryptFile(byts, outputfile);
-			Console.WriteLine("Hata: " + hata);
+			MemoryStream ms2 = new MemoryStream();
+
+			string path = @"text2.txt";
+			string path2 = @"textEnc.txt";
+			using (FileStream fs1 = new FileStream(path, FileMode.Open))
+			using (FileStream fs2 = new FileStream(path2, FileMode.Create))
+			using(MemoryStream ms1 = new MemoryStream())
+			{
+				fs1.CopyTo(ms1);
+
+				SIFRELEME sifreleme = new SIFRELEME();
+				ms2 = sifreleme.Kilitle(ms1);
+				ms2.Position = 0;
+				ms2.CopyTo(fs2);
+				fs2.Position = 0;
+				fs2.Flush();
+			}
+
+
+			ms2.Dispose();
+			Console.WriteLine("Tamamlandı");
 			Console.ReadKey();
 		}
 	}
 
-	public static class AES
+	public class SIFRELEME
 	{
-		public static string EncryptFile(byte[] buffer, string outputFile)
+		public MemoryStream Kilitle(MemoryStream input)
 		{
-			Console.WriteLine("BufferBoyutu: " + buffer.Length);
-
-			try
+			RijndaelManaged RMCrypto = new RijndaelManaged();
+			var key = new UnicodeEncoding().GetBytes("MyKEY001");
+			using (CryptoStream cs = new CryptoStream(input, RMCrypto.CreateEncryptor(key, key), CryptoStreamMode.Read))
 			{
-				UnicodeEncoding UE = new UnicodeEncoding();
-				byte[] key = UE.GetBytes("MyKEY001");
-				RijndaelManaged RMCrypto = new RijndaelManaged();
-				
-				FileStream outputFS = new FileStream(outputFile, FileMode.Create, FileAccess.Write);
-				CryptoStream cs = new CryptoStream(outputFS, RMCrypto.CreateEncryptor(key, key), CryptoStreamMode.Write);
-
-				cs.Write(buffer, 0, buffer.Length);
-				
-				cs.Close();
-				outputFS.Close();
-				return "Tamam";
-			}
-			catch (Exception e)
-			{
-				return e.Message;
+				MemoryStream output = new MemoryStream();
+				input.Position = 0;
+				cs.CopyTo(output);
+				return output;
 			}
 		}
 
-		public static void DecryptFile(string inputFile, string outputFile)
+		public MemoryStream KilitAç(MemoryStream input)
 		{
-			try
+			RijndaelManaged RMCrypto = new RijndaelManaged();
+			var key = new UnicodeEncoding().GetBytes("MyKEY001");
+			using (CryptoStream cs = new CryptoStream(input, RMCrypto.CreateDecryptor(key, key), CryptoStreamMode.Read))
 			{
-				UnicodeEncoding UE = new UnicodeEncoding();
-				byte[] key = UE.GetBytes("MyKEY001");
-				FileStream fsCrypt = new FileStream(inputFile, FileMode.Open);
-				RijndaelManaged RMCrypto = new RijndaelManaged();
-				CryptoStream cs = new CryptoStream(fsCrypt, RMCrypto.CreateDecryptor(key, key), CryptoStreamMode.Read);
-				FileStream fsOut = new FileStream(outputFile, FileMode.Create);
-				int data;
-				while ((data = cs.ReadByte()) != -1)
-					fsOut.WriteByte((byte)data);
-				fsOut.Close();
-				cs.Close();
-				fsCrypt.Close();
+				MemoryStream output = new MemoryStream();
+				cs.CopyTo(output);
+				return output;
 			}
-			catch
-			{
 
-			}
 		}
 	}
 }

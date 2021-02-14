@@ -13,7 +13,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web;
-using UtaemKomiteV2.Models;
 using System.Globalization;
 using Microsoft.AspNetCore.Http;
 
@@ -153,61 +152,33 @@ namespace UtaemKomiteV2.Araclar
 		#endregion
 	}
 
-	public static class AES
+	public class SIFRELEME
 	{
-		public static string EncryptFile(IFormFile dosya, string outputFile)
+		public MemoryStream Kilitle(MemoryStream input)
 		{
-			try
+			RijndaelManaged RMCrypto = new RijndaelManaged();
+			var key = new UnicodeEncoding().GetBytes("MyKEY001");
+			using (CryptoStream cs = new CryptoStream(input, RMCrypto.CreateEncryptor(key, key), CryptoStreamMode.Read))
 			{
-				UnicodeEncoding UE = new UnicodeEncoding();
-				byte[] key = UE.GetBytes("MyKEY001");
-				RijndaelManaged RMCrypto = new RijndaelManaged();
-
-				Stream stream = dosya.OpenReadStream();
-				MemoryStream ms = new MemoryStream();
-				stream.CopyTo(ms);
-
-				FileStream outputFS = new FileStream(outputFile, FileMode.Create);
-				CryptoStream cs = new CryptoStream(outputFS, RMCrypto.CreateEncryptor(key, key), CryptoStreamMode.Write);
-				
-				byte[] buffer = ms.ToArray();
-				cs.Write(buffer, 0, buffer.Length);
-
-				cs.Close();
-				outputFS.Close();
-				return "Tamam";
-			}
-			catch(Exception e)
-			{
-				return e.Message;
+				MemoryStream output = new MemoryStream();
+				input.Position = 0;
+				cs.CopyTo(output);
+				return output;
 			}
 		}
 
-		public static string DecryptFile(FileStream inputFile, string outputFile)
+		public MemoryStream	KilitAç(MemoryStream input)
 		{
-			try
+			RijndaelManaged RMCrypto = new RijndaelManaged();
+			var key = new UnicodeEncoding().GetBytes("MyKEY001");
+			using (CryptoStream cs = new CryptoStream(input, RMCrypto.CreateDecryptor(key, key), CryptoStreamMode.Read))
 			{
-				UnicodeEncoding UE = new UnicodeEncoding();
-				byte[] key = UE.GetBytes("MyKEY001");
-				RijndaelManaged RMCrypto = new RijndaelManaged();
-
-				MemoryStream ms = new MemoryStream();
-				inputFile.CopyTo(ms);
-
-				FileStream outputFS = new FileStream(outputFile, FileMode.Create);
-				CryptoStream cs = new CryptoStream(inputFile, RMCrypto.CreateDecryptor(key, key), CryptoStreamMode.Read);
-
-				byte[] buffer = ms.ToArray();
-				cs.Write(buffer, 0, buffer.Length);
-
-				cs.Close();
-				inputFile.Close();
-				return "Tamam";
+				MemoryStream output = new MemoryStream();
+				input.Position = 0;
+				cs.CopyTo(output);
+				return output;
 			}
-			catch (Exception e)
-			{
-				return e.Message;
-			}
+
 		}
 	}
 
