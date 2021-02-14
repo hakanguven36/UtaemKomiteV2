@@ -30,7 +30,6 @@ namespace Deneme
 				fs2.Flush();
 			}
 
-
 			ms2.Dispose();
 			Console.WriteLine("Tamamlandı");
 			Console.ReadKey();
@@ -59,10 +58,10 @@ namespace Deneme
 			using (CryptoStream cs = new CryptoStream(input, RMCrypto.CreateDecryptor(key, key), CryptoStreamMode.Read))
 			{
 				MemoryStream output = new MemoryStream();
+				input.Position = 0;
 				cs.CopyTo(output);
 				return output;
 			}
-
 		}
 	}
 }

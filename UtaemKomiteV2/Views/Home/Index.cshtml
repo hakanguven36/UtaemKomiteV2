@@ -2,8 +2,12 @@
 @{ 
     int i = 0;
     Random r = new Random(DateTime.Now.Millisecond);
+    bool admin = Context.Session.GetString("kulrol") == "admin";
 }
-
+@if (admin)
+{
+    <div>BEN ADMİNİM ULEYYN</div>
+}
 <div>
     @foreach (var item in Html.GetEnumSelectList<DOSYATURU>())
     {
@@ -35,7 +39,11 @@
                         <td>@a.boyut</td>
                         <td>@a.kulName</td>
                         <td>
-                            <a class="btn btn-sm btn-outline-primary" asp-controller="Home" asp-action="Dosyaİndir" asp-route-id="@a.ID"><span class="fas fa-file-download"></span></a>
+                            <a class="btn btn-sm btn-outline-primary" asp-controller="Home" asp-action="Dosyaİndir" asp-route-id="@a.ID"><span class="fas fa-download"></span></a>
+                            @if (admin)
+                            {
+                                <button class="btn btn-sm btn-outline-danger" onclick="DosyaSilSor(@a.ID)">sil!</button>
+                            }
                         </td>
                     </tr>
                 }
@@ -59,4 +67,30 @@
         var rand3 = Math.floor(200 + Math.random() * 50);
         $(this).css("background-color", "rgb(" + rand1 + "," + rand2 + "," + rand3 + ")");
     });
+
+    var silinecekID = 0;
+    function DosyaSilSor(id) {
+        silinecekID = id;
+        var onay = new OzOnay();
+        onay.evetCls = "btn btn-danger";
+        onay.hayirCls = "btn btn-secondary";
+        onay.evetTxt = "Evet,sil!!";
+        onay.hayirTxt = "İptal";
+        onay.soruCls = "text-danger h3"
+        onay.soruTxt = "Bu dosya silinecek! Onaylıyor musunuz?";
+        onay.Sor(DosyaSil, DosyaSilme);
+        function DosyaSil() {
+            new OzAjax("/Home/DosyaSil", POST, { id: id }, dosyaSilBasari).BasitGonder();
+            function dosyaSilBasari(data) {
+                if (data == '"Tamam"')
+                    window.location = "/Home/Index";
+                else
+                    new OzModal().Bilgi(data);
+            }
+        }
+        function DosyaSilme() {
+            new OzModal().Bilgi("Silme iptal edildi..", 600);
+        }
+    }
+
 </script>

@@ -29,7 +29,7 @@ namespace UtaemKomiteV2.Controllers
 
 		public IActionResult Index()
 		{
-			return View(db.Dosya.ToList());
+			return View(db.Dosya.Where(u=>u.silindi != true).ToList());
 		}
 
 		[HttpGet]
@@ -115,6 +115,24 @@ namespace UtaemKomiteV2.Controllers
 				HttpContext.Response.OnCompleted(async () => await Task.Run(() => output.Dispose()));
 			}
 			
+		}
+
+		public IActionResult DosyaSil(int id)
+		{
+			try
+			{
+				var dosya = db.Dosya.FirstOrDefault(u => u.ID == id);
+				if (dosya == null)
+					return Json("Hata: Böyle bir id yok!");
+				dosya.silindi = true;
+				db.Entry(dosya).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+				db.SaveChanges();
+				return Json("Tamam");
+			}
+			catch (Exception e)
+			{
+				return Json(e.Message);
+			}
 		}
 
 		
