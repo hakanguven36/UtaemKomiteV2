@@ -12,7 +12,7 @@ namespace UtaemKomiteV2.ViewModels
 		public int ID { get; set; }
 
 		[Required]
-		[StringLength(16, MinimumLength = 4, ErrorMessage = "4-16 karakter olmalı!")]
+		[StringLength(30, MinimumLength = 4, ErrorMessage = "4-30 karakter olmalı!")]
 		[DisplayName("Kullanıcı Adı")]
 		public string username { get; set; }
 
