@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +21,11 @@ namespace UtaemKomiteV2
 			Host.CreateDefaultBuilder(args)
 				.ConfigureWebHostDefaults(webBuilder =>
 				{
+					webBuilder.ConfigureKestrel(serverOptions =>
+					serverOptions.ConfigureHttpsDefaults(co =>
+					{
+						co.SslProtocols = SslProtocols.Tls12;
+					}));
 					webBuilder.UseStartup<Startup>();
 				});
 	}

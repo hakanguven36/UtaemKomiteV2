@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using UtaemKomiteV2.Araclar;
 using UtaemKomiteV2.Models;
 using MimeMapping;
+using Microsoft.EntityFrameworkCore;
 
 namespace UtaemKomiteV2.Controllers
 {
@@ -29,24 +30,28 @@ namespace UtaemKomiteV2.Controllers
 
 		public IActionResult Index()
 		{
-			return View(db.Dosya.Where(u=>u.silindi != true).ToList());
+			var dosyaList = db.Dosya.Include(u=>u.tur).Where(u => u.silindi != true).ToList();
+			var turList = dosyaList.Select(u=>u.tur).GroupBy(u => u.isim).ToList().Select(u=>u.Key).ToList();
+			ViewBag.turList = turList;
+
+			return View(dosyaList);
 		}
 
 		[HttpGet]
 		public IActionResult YeniDosyaEkle(string dosyaTuru)
 		{
-			DOSYATURU tur = Enum.Parse<DOSYATURU>(dosyaTuru);
+			var tur = db.Tur.FirstOrDefault(u => u.isim == dosyaTuru);
 			return PartialView(new Dosya() { tur = tur });
 		}
 
 		[HttpPost]
-		public IActionResult YeniDosyaEkle(string tur, IFormFile dosya)
+		public IActionResult YeniDosyaEkle(int turID, IFormFile dosya)
 		{
 			try
 			{
-				DOSYATURU theTur;
-				if (!Enum.TryParse(tur, true, out theTur))
-					throw new Exception("Hata: tür seçilmedi!");
+				Tur theTur = db.Tur.FirstOrDefault(u=>u.ID == turID);
+				if (theTur == null)
+					throw new Exception("Hata: tür seçimi hatalı!");
 				if (dosya == null)
 					throw new Exception("Hata: Dosya eklemediniz!");
 				if (dosya.Length < 1)

@@ -1,13 +1,22 @@
 ﻿@model UtaemKomiteV2.Models.Dosya
+@{
+    List<Tur> turler =  (List<Tur>) ViewBag.turler;
+
+}
 
 <h5>Dosya Ekle</h5>
 <hr />
 
 <form id="YeniDosyaEkle" enctype="multipart/form-data">
-    <input type="hidden" id="dosyaTuru" value="@Enum.GetName(typeof(DOSYATURU),Model.tur)" />
+    <input type="hidden" id="dosyaTuru" value="@Model.tur.isim" />
     <div class="form-group">
         <label for="tur" class="control-label">Dosya Türü</label>
-        <select asp-for="tur" class="form-control" asp-items="Html.GetEnumSelectList<DOSYATURU>()"></select>
+        <select name="tur" id="tur" class="form-control" >
+            @foreach (var tur in turler)
+            {
+                <option value="@tur.isim">@tur.isim</option>
+            }
+        </select>
     </div>
     <div class="form-group">
         <label for="budosya" class="control-label"></label>

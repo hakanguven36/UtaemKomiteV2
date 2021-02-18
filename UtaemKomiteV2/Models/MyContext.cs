@@ -13,5 +13,6 @@ namespace UtaemKomiteV2.Models
 		}
 		public DbSet<Kullar> Kullar { get; set; }
 		public DbSet<Dosya> Dosya { get; set; }
+		public DbSet<Tur> Tur { get; set; }
 	}
 }

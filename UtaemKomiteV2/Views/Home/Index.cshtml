@@ -1,22 +1,26 @@
 ﻿@model IEnumerable<UtaemKomiteV2.Models.Dosya>
-@{ 
-    int i = 0;
-    Random r = new Random(DateTime.Now.Millisecond);
+@{
     bool admin = Context.Session.GetString("kulrol") == "admin";
+    List<string> turList = (List<string>)ViewBag.turList;
 }
-@if (admin)
-{
-    <div>BEN ADMİNİM ULEYYN</div>
-}
-<div>
-    @foreach (var item in Html.GetEnumSelectList<DOSYATURU>())
+
+<!-- Tab links -->
+<div class="tab">
+    @foreach (var item in turList)
     {
+        <button class="tablinks" onclick="openCity(event, '@item')">@item</button>
+    }
+</div>
+
+@foreach (var item in turList)
+{
+<div id="@item" class="tabcontent">
     <div class="dosyalarDiv">
         <div class="auto">
-            <button onclick="YeniDosyaEkleFormAc('@item.Text')" class="btn btn-sm btn-warning float-right" ><span class="fas fa-plus"></span> Yeni Dosya Ekle</button>
-            <h5><u>@item.Text</u></h5>
+            <button onclick="YeniDosyaEkleFormAc('@item')" class="btn btn-sm btn-warning float-right"><span class="fas fa-plus"></span> Yeni Dosya Ekle</button>
+            <h5><u>@item</u></h5>
         </div>
-        
+
         <table class="table">
             <thead>
                 <tr>
@@ -28,7 +32,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var a in Model.Where(u => Convert.ToInt32(u.tur) == i))
+                @foreach (var a in Model.Where(u => u.tur.isim == item))
                 {
                     <tr>
                         <td>
@@ -49,24 +53,18 @@
                 }
             </tbody>
         </table>
-    </div>        
-        i++;
-    }
-</div>
+    </div>
+</div>    		 
+}
+
 
 <script>
-    function YeniDosyaEkleFormAc(dosyaTuru){
+    function YeniDosyaEkleFormAc(dosyaTuru) {
         new OzAjax("/Home/YeniDosyaEkle", GET, { dosyaTuru: dosyaTuru }, formAcBasari).BasitGonder();
         function formAcBasari(data) {
             new OzModal().Sayfa(data);
         }
     }
-    $(".dosyalarDiv").each(function (i, e) {
-        var rand1 = Math.floor(200 + Math.random() * 50);
-        var rand2 = Math.floor(200 + Math.random() * 50);
-        var rand3 = Math.floor(200 + Math.random() * 50);
-        $(this).css("background-color", "rgb(" + rand1 + "," + rand2 + "," + rand3 + ")");
-    });
 
     var silinecekID = 0;
     function DosyaSilSor(id) {
@@ -91,6 +89,23 @@
         function DosyaSilme() {
             new OzModal().Bilgi("Silme iptal edildi..", 600);
         }
+    }
+
+    function openCity(evt, cityName) {
+        var i, tabcontent, tablinks;
+
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        document.getElementById(cityName).style.display = "block";
+        evt.currentTarget.className += " active";
     }
 
 </script>
