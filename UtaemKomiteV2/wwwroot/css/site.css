@@ -89,6 +89,8 @@ body {
     overflow: hidden;
     border: 1px solid #ccc;
     background-color: #f1f1f1;
+    border-top-left-radius: 1em;
+    border-top-right-radius: 1em;
 }
 
     /* Style the buttons that are used to open the tab content */

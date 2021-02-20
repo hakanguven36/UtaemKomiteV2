@@ -1,26 +1,15 @@
-﻿@model UtaemKomiteV2.Models.Dosya
-@{
-    List<Tur> turler =  (List<Tur>) ViewBag.turler;
-
+﻿@{
+    string dosyaTuru = ViewBag.dosyaTuru;
 }
 
-<h5>Dosya Ekle</h5>
+<h5>Yeni "@dosyaTuru" Ekle</h5>
 <hr />
 
 <form id="YeniDosyaEkle" enctype="multipart/form-data">
-    <input type="hidden" id="dosyaTuru" value="@Model.tur.isim" />
+    <input type="hidden" id="dosyaTuru" value="@dosyaTuru" />
     <div class="form-group">
-        <label for="tur" class="control-label">Dosya Türü</label>
-        <select name="tur" id="tur" class="form-control" >
-            @foreach (var tur in turler)
-            {
-                <option value="@tur.isim">@tur.isim</option>
-            }
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="budosya" class="control-label"></label>
-        <input type="file" class="form-control-file" name="budosya" id="budosya" />
+        <label for="dosya" class="control-label"></label>
+        <input type="file" class="form-control-file" name="dosya" id="dosya" />
     </div>
     <div class="form-group">
         <input type="submit" value="EKLE" class="btn btn-primary" />
@@ -31,10 +20,10 @@
     $("#YeniDosyaEkle").submit(function (e) {
         e.preventDefault();
         var formData = new FormData();
-        var dosya = document.getElementById("budosya").files[0];
+        var dosya = document.getElementById("dosya").files[0];
         formData.append("dosya", dosya);
         var dosyaTuru = $("#dosyaTuru").val();
-        formData.append("tur", dosyaTuru);
+        formData.append("dosyaTuru", dosyaTuru);
         new OzAjax("/Home/YeniDosyaEkle", POST, formData, yeniDosyaEkleBasari).MultiGonder();
         function yeniDosyaEkleBasari(data) {
             if (data == '"Tamam"') {

@@ -31,25 +31,25 @@ namespace UtaemKomiteV2.Controllers
 		public IActionResult Index()
 		{
 			var dosyaList = db.Dosya.Include(u=>u.tur).Where(u => u.silindi != true).ToList();
-			var turList = dosyaList.Select(u=>u.tur).GroupBy(u => u.isim).ToList().Select(u=>u.Key).ToList();
-			ViewBag.turList = turList;
-
+			ViewBag.turList = db.Tur.Select(u => u.isim).ToList();
 			return View(dosyaList);
 		}
 
 		[HttpGet]
 		public IActionResult YeniDosyaEkle(string dosyaTuru)
 		{
-			var tur = db.Tur.FirstOrDefault(u => u.isim == dosyaTuru);
-			return PartialView(new Dosya() { tur = tur });
+			ViewBag.dosyaTuru = dosyaTuru;
+			return PartialView();
 		}
 
 		[HttpPost]
-		public IActionResult YeniDosyaEkle(int turID, IFormFile dosya)
+		public IActionResult YeniDosyaEkle(string dosyaTuru, IFormFile dosya)
 		{
 			try
 			{
-				Tur theTur = db.Tur.FirstOrDefault(u=>u.ID == turID);
+				if (string.IsNullOrWhiteSpace(dosyaTuru))
+					throw new Exception("Hata: Dosya türü belirsiz!");
+				Tur theTur = db.Tur.FirstOrDefault(u=>u.isim == dosyaTuru);
 				if (theTur == null)
 					throw new Exception("Hata: tür seçimi hatalı!");
 				if (dosya == null)
@@ -74,7 +74,7 @@ namespace UtaemKomiteV2.Controllers
 				d.tur = theTur;
 				d.tarih = DateTime.Now;
 				d.isim = Path.GetFileNameWithoutExtension(dosya.FileName);
-				d.boyut = Math.Round(Convert.ToDouble(dosya.Length / 1024), 2);
+				d.boyut = dosya.Length;
 				d.uzantı = Path.GetExtension(dosya.FileName);
 				d.sysname = sysname;
 				d.kulName = HttpContext.Session.GetString("kulname");
@@ -93,6 +93,7 @@ namespace UtaemKomiteV2.Controllers
 		public IActionResult Dosyaİndir(int id)
 		{
 			MemoryStream output = new MemoryStream();
+			
 			try
 			{
 				var d = db.Dosya.FirstOrDefault(u=>u.ID == id);
@@ -104,6 +105,7 @@ namespace UtaemKomiteV2.Controllers
 				{
 					fs.CopyTo(ms);
 					output = new SIFRELEME().KilitAç(ms);
+					output.Capacity = Convert.ToInt32(d.boyut);
 				}
 
 				string mimeType = MimeUtility.GetMimeMapping(d.isim + d.uzantı);

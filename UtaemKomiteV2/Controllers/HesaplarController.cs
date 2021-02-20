@@ -199,13 +199,14 @@ namespace UtaemKomiteV2.Controllers
 					kul.kulpass = pass;
 					db.Kullar.Add(kul);
 					db.SaveChanges();
+					return Json("Tamam");
 				}
+				return Json("Kurucu üye zaten var!");
 			}
 			catch (Exception e)
 			{
 				return PartialView(e.Message);
 			}
-			return PartialView();
 		}
 	}
 }
