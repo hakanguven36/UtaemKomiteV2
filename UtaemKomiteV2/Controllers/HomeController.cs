@@ -30,7 +30,7 @@ namespace UtaemKomiteV2.Controllers
 
 		public IActionResult Index()
 		{
-			var dosyaList = db.Dosya.Include(u=>u.tur).Where(u => u.silindi != true).ToList();
+			var dosyaList = db.Dosya.Include(u=>u.tur).Where(u => u.silindi != true).OrderByDescending(u=>u.tarih).ToList();
 			ViewBag.turList = db.Tur.Select(u => u.isim).ToList();
 			return View(dosyaList);
 		}

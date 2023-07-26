@@ -26,7 +26,6 @@
                     <th>Dosya adı</th>
                     <th>Tarih</th>
                     <th>Boyut(kb)</th>
-                    <th>Yükleyen</th>
                     <th></th>
                 </tr>
             </thead>
@@ -40,7 +39,6 @@
                     </td>
                     <td>@a.tarih</td>
                     <td>@Math.Round(Convert.ToDouble(a.boyut / 1024), 2)</td>
-                    <td>@a.kulName</td>
                     <td>
                         <a class="btn btn-sm btn-outline-primary" asp-controller="Home" asp-action="Dosyaİndir" asp-route-id="@a.ID"><span class="fas fa-download"></span></a>
                         @if (admin)
